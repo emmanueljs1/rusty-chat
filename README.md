@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 Current Usage:
 
 - `cd server` and then `cargo run` to run server
