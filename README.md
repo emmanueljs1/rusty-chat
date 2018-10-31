@@ -10,7 +10,6 @@ Chat Server Project
 Overview:
 We will build a chat server that will allow various users to communicate in chat rooms. We plan to use the terminal to allow users to chat, and our stretch goal will be to implement in a GUI.
 
-
 Components:
 * Backend
    * take advantage of Rust’s concurrency
