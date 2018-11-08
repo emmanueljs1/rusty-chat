@@ -20,6 +20,7 @@ Components:
          * /join <channel> (strech goal)
 
 Example:
+
 Yash's Window:
 ```
 User0 joined.
