@@ -18,32 +18,38 @@ Components:
          * /color <color>
          * /leave
          * /join <channel> (strech goal)
-   * Example:
 
-        Yash
-                User0 joined.
-                User1 joined.
-                User0 changed their name to Yash.
-                User1 changed their name to Megan.
-		        Yash: Hello
+Example:
+Yash's Window:
+```
+User0 joined.
+User1 joined.
+User0 changed their name to Yash.
+User1 changed their name to Megan.
+Yash: Hello
+Megan: Hi
 
-                > /nickname Yash
-                > /color red
-                > /msg Hello
-                >
+
+> /nickname Yash
+> /color red
+> /msg Hello
+>
+```
 --------------------------------------------------------------------------------------------------------------
-        Megan
+Megan's Window:
+```
+User0 joined.
+User1 joined.
+User0 changed their name to Yash.
+User1 changed their name to Megan.
+Yash: Hello
+Megan: Hi
 
-		        User0 joined.
-                User1 joined.
-                User0 changed their name to Yash.
-                User1 changed their name to Megan.
-                Yash: Hello
-                Megan: Hi
 
-                > /nickname Megan
-                > /msg Hi
-                >
 
+> /nickname Megan
+> /msg Hi
+>
+```
    * Potentially a GUI (stretch goal)
       * Use relm (https://github.com/antoyo/relm) or conrod (https://github.com/PistonDevelopers/conrod)
