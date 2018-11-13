@@ -1,0 +1,6 @@
+- Megan:
+    model / command API
+- Yash:
+    terminal stuff
+- Emma:
+    threads/sockets ??
