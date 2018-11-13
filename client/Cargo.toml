@@ -1,0 +1,6 @@
+[package]
+name = "chat-stream"
+version = "0.1.0"
+authors = ["Emmanuel Suarez Acevedo <emmanueljs1@gmail.com>"]
+
+[dependencies]
