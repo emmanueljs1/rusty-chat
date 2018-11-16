@@ -1,3 +1,12 @@
+extern crate gtk;
+#[macro_use] extern crate relm;
+#[macro_use] extern crate relm_derive;
+
+mod gui;
+use gui::Win;
+
+use relm::Widget;
+
 use std::io::prelude::*;
 use std::net::TcpStream;
 use std::thread;
@@ -8,6 +17,13 @@ fn main() -> std::io::Result<()> {
     let arc = Arc::new(RwLock::new(stream));
     let connection_closed = Arc::new(RwLock::new(false));
     arc.read().expect("Could not lock").set_nonblocking(true)?;
+
+    /* TODO (yash):
+    gui.rs code is pasted from https://github.com/antoyo/relm/blob/master/examples/text-fields.rs
+
+    change the GUI to be a chat-like UI that prints the users message to the message box when they
+    press enter in the text entry box
+    */
 
     let mut handles = vec![];
 
@@ -24,7 +40,6 @@ fn main() -> std::io::Result<()> {
                     break;
                 }
                 Ok(n) => {
-                    // TODO (yash): output buf to GUI instead (printing right now for testing)
                     print!("Server: {}", std::str::from_utf8(&buf[0..n]).unwrap());
                 }
                 Err(e) => {
@@ -50,7 +65,6 @@ fn main() -> std::io::Result<()> {
             if !connection_closed {
                 let mut string = String::new();
 
-                // TODO (yash): read from GUI instead of stdin
                 std::io::stdin().read_line(&mut string).expect("Could not read from stdin");
 
                 let mut stream = stream_lock.write().expect("Could not lock");
@@ -64,6 +78,8 @@ fn main() -> std::io::Result<()> {
         }
     });
     handles.push(write_handle);
+
+    Win::run(()).expect("Win::run failed");
 
     for handle in handles {
         handle.join().expect("Error joining threads");
