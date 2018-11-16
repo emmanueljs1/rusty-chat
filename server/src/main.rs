@@ -30,6 +30,7 @@ fn main() -> std::io::Result<()> {
 
                 let handle = thread::spawn(move || {
                     let mut just_connected = true;
+                    let mut stream_closed = false;
 
                     /* TODO (megan):
                         let user_id = model.registerUser();
@@ -47,10 +48,23 @@ fn main() -> std::io::Result<()> {
 
                         loop {
                             match stream.read(&mut buf) {
-                                Ok(0) => break,
+                                Ok(0) => {
+                                    stream_closed = true;
+                                    break;
+                                }
                                 Ok(n) => buffer.push_str(std::str::from_utf8(&buf[0..n]).unwrap()),
-                                Err(_) => break,
+                                Err(e) =>  {
+                                    match e.kind() {
+                                        std::io::ErrorKind::WouldBlock => (),
+                                        _ => stream_closed = true,
+                                    }
+                                    break;
+                                }
                             };
+                        }
+
+                        if stream_closed {
+                            break;
                         }
 
                         if just_connected {
@@ -92,6 +106,9 @@ fn main() -> std::io::Result<()> {
 
                          just_connected = false;
                     }
+
+                    let mut streams = thread_streams.write().expect("Could not lock");
+                    streams.remove(&addr);
                  });
 
                 handles.push(handle);
