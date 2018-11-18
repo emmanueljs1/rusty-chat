@@ -70,7 +70,7 @@ fn main() -> std::io::Result<()> {
                         if just_connected {
                             for mut stream in streams.values() {
                                 // TODO (megan): change 'User' to model.getNickname(user_id)
-                                let _ = stream.write(&"User connected\n".to_string().as_bytes());
+                                let _ = stream.write(&"User connected".to_string().as_bytes());
                                 let _ = stream.flush();
                             }
                         }
