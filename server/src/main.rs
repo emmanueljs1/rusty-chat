@@ -50,13 +50,17 @@ fn main() -> std::io::Result<()> {
                             match stream.read(&mut buf) {
                                 Ok(0) => {
                                     stream_closed = true;
+                                    println!("Client exited: {}", addr);
                                     break;
                                 }
                                 Ok(n) => buffer.push_str(std::str::from_utf8(&buf[0..n]).unwrap()),
                                 Err(e) =>  {
                                     match e.kind() {
                                         std::io::ErrorKind::WouldBlock => (),
-                                        _ => stream_closed = true,
+                                        _ => {
+                                            stream_closed = true;
+                                            println!("Client exited: {}", addr);
+                                        }
                                     }
                                     break;
                                 }
