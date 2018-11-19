@@ -1,9 +1,11 @@
 use gtk::{
     AdjustmentExt,
     Align,
+    BoxExt,
     ContainerExt,
     Entry,
     EntryExt,
+    GtkWindowExt,
     Inhibit,
     Label,
     LabelExt,
@@ -108,9 +110,6 @@ impl Update for Win {
                         self.model.content += "\n";
                         self.model.content += &string;
                         self.widgets.label.set_text(&self.model.content);
-
-                        // println!("{:?}", self.widgets.messages.get_vadjustment().unwrap().get_upper());
-
                     }
                     None => gtk::main_quit(),
                 }
@@ -150,23 +149,14 @@ impl Widget for Win {
 
         let vbox = gtk::Box::new(Vertical, 2);
 
+        // Conversation History
         let messages = ScrolledWindow::new(None, None);
-        messages.set_min_content_height(10);
+        messages.set_min_content_height(400);
         let label = Label::new(None);
         label.set_valign(Align::Start);
         label.set_halign(Align::Start);
-        // println!("{:?}", label.get_valign());
         messages.add(&label);
-        // println!("{:?}", messages.get_vadjustment().unwrap().get_upper());
-        vbox.add(&messages);
-
-        // Message Input
-        let message_box = gtk::Box::new(Horizontal, 1);
-        let input = Entry::new();
-        message_box.add(&input);
-        let button = Button::new_with_label("Send");
-        message_box.add(&button);
-        vbox.add(&message_box);
+        vbox.pack_start(&messages, true, true, 0);
 
         // Change username input
         let username_box = gtk::Box::new(Horizontal, 1);
@@ -174,12 +164,21 @@ impl Widget for Win {
         username_box.add(&user_input);
         let username_button = Button::new_with_label("Change username");
         username_box.add(&username_button);
-        vbox.add(&username_box);
+        vbox.pack_end(&username_box, false, false, 0);
+
+        // Message Input
+        let message_box = gtk::Box::new(Horizontal, 1);
+        let input = Entry::new();
+        input.set_width_chars(30);
+        message_box.pack_start(&input, true, true, 0);
+        let button = Button::new_with_label("Send");
+        message_box.pack_end(&button, false, false, 0);
+        vbox.pack_end(&message_box, false, false, 0);
 
         let window = Window::new(WindowType::Toplevel);
-
+        // TODO: figure out how to add username to window title
+        window.set_title("Chat");
         window.add(&vbox);
-
         window.show_all();
 
         connect!(relm, messages.get_vadjustment().unwrap(), connect_property_upper_notify(_), ScrollDown);
