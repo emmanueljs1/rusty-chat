@@ -1,4 +1,6 @@
 use gtk::{
+    AdjustmentExt,
+    Align,
     ContainerExt,
     Entry,
     EntryExt,
@@ -7,6 +9,7 @@ use gtk::{
     LabelExt,
     WidgetExt,
     ScrolledWindow,
+    ScrolledWindowExt,
     Window,
     WindowType,
     Button,
@@ -28,6 +31,7 @@ pub struct Model {
 
 #[derive(Msg)]
 pub enum Msg {
+    ScrollDown,
     SendMsg,
     Quit,
     Received(Option<String>),
@@ -40,6 +44,7 @@ pub struct Win {
 
 #[derive(Clone)]
 pub struct Widgets {
+    messages: ScrolledWindow,
     input: Entry,
     label: Label,
     window: Window,
@@ -103,6 +108,9 @@ impl Update for Win {
                         self.model.content += "\n";
                         self.model.content += &string;
                         self.widgets.label.set_text(&self.model.content);
+
+                        // println!("{:?}", self.widgets.messages.get_vadjustment().unwrap().get_upper());
+
                     }
                     None => gtk::main_quit(),
                 }
@@ -118,6 +126,10 @@ impl Update for Win {
                     /* TODO: instead send a command formatted string */
                     let _ = stream.write(&string.as_bytes());
                 }
+            }
+            ScrollDown => {
+                let scroll_pos = self.widgets.messages.get_vadjustment().unwrap();
+                scroll_pos.set_value(scroll_pos.get_upper());
             }
             Quit => gtk::main_quit(),
         }
@@ -138,20 +150,31 @@ impl Widget for Win {
 
         let vbox = gtk::Box::new(Vertical, 2);
 
-        let scroll_window = ScrolledWindow::new(None, None);
+        let messages = ScrolledWindow::new(None, None);
+        messages.set_min_content_height(10);
         let label = Label::new(None);
-        scroll_window.add(&label);
-        vbox.add(&scroll_window);
+        label.set_valign(Align::Start);
+        label.set_halign(Align::Start);
+        // println!("{:?}", label.get_valign());
+        messages.add(&label);
+        // println!("{:?}", messages.get_vadjustment().unwrap().get_upper());
+        vbox.add(&messages);
 
-        let hbox = gtk::Box::new(Horizontal, 0);
-
+        // Message Input
+        let message_box = gtk::Box::new(Horizontal, 1);
         let input = Entry::new();
-        hbox.add(&input);
-
+        message_box.add(&input);
         let button = Button::new_with_label("Send");
-        hbox.add(&button);
+        message_box.add(&button);
+        vbox.add(&message_box);
 
-        vbox.add(&hbox);
+        // Change username input
+        let username_box = gtk::Box::new(Horizontal, 1);
+        let user_input = Entry::new();
+        username_box.add(&user_input);
+        let username_button = Button::new_with_label("Change username");
+        username_box.add(&username_button);
+        vbox.add(&username_box);
 
         let window = Window::new(WindowType::Toplevel);
 
@@ -159,12 +182,14 @@ impl Widget for Win {
 
         window.show_all();
 
+        connect!(relm, messages.get_vadjustment().unwrap(), connect_property_upper_notify(_), ScrollDown);
         connect!(relm, button, connect_clicked(_), SendMsg);
         connect!(relm, window, connect_delete_event(_, _), return (Some(Quit), Inhibit(false)));
 
         Win {
             model,
             widgets: Widgets {
+                messages,
                 input,
                 label,
                 window,
