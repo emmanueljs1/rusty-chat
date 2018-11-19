@@ -50,7 +50,6 @@ fn main() -> std::io::Result<()> {
                             match stream.read(&mut buf) {
                                 Ok(0) => {
                                     stream_closed = true;
-                                    println!("Client exited: {}", addr);
                                     break;
                                 }
                                 Ok(n) => buffer.push_str(std::str::from_utf8(&buf[0..n]).unwrap()),
@@ -59,7 +58,6 @@ fn main() -> std::io::Result<()> {
                                         std::io::ErrorKind::WouldBlock => (),
                                         _ => {
                                             stream_closed = true;
-                                            println!("Client exited: {}", addr);
                                         }
                                     }
                                     break;
@@ -113,6 +111,7 @@ fn main() -> std::io::Result<()> {
 
                     let mut streams = thread_streams.write().expect("Could not lock");
                     streams.remove(&addr);
+                    println!("Client exited: {}", addr);
                  });
 
                 handles.push(handle);
