@@ -42,6 +42,7 @@ pub enum Msg {
     Quit,
     Received(Option<String>),
     OpenUsernameDialog,
+    ChangeUsername,
 }
 
 pub struct Win {
@@ -55,6 +56,8 @@ pub struct Widgets {
     input: Entry,
     label: Label,
     window: Window,
+    username_input: Entry,
+    username_dialog: Dialog,
 }
 
 impl Update for Win {
@@ -136,23 +139,17 @@ impl Update for Win {
                 scroll_pos.set_value(scroll_pos.get_upper());
             }
             OpenUsernameDialog => {
-                // let username_window = Window::new(WindowType::Toplevel);
-                let username_dialog = Dialog::new_with_buttons(
-                        Some("Change Username"),
-                        Some(&self.widgets.window),
-                        DialogFlags::MODAL | DialogFlags::DESTROY_WITH_PARENT,
-                        &[("Change", ResponseType::Apply.into()), 
-                          ("Cancel", ResponseType::Cancel.into())]
-                    );
-                let user_input = Entry::new();
-                // let username_box = gtk::Box::new(Horizontal, 1);
-                // username_box.add(&user_input);
-                // let action_area = username_dialog.get_action_area();
-                // action_area.add(user_input);
-                username_dialog.get_content_area().add(&user_input);
-                username_dialog.show_all();
-                // username_dialog::run();
-                // username_window.add(&username_dialog);
+                self.widgets.username_dialog.show_all();
+            }
+            ChangeUsername => {
+                let new_username: String = self.widgets.username_input.get_text()
+                                               .expect("get_text failed")
+                                               .chars()
+                                               .collect();
+                if !new_username.is_empty() {
+                    self.widgets.username_input.set_text("");
+                    println!("{:?}", new_username);
+                }
             }
             Quit => gtk::main_quit(),
         }
@@ -171,6 +168,7 @@ impl Widget for Win {
             - change GUI to be a _real_ GUI
             - add option to change nickname and (possibly?) to change text color */
 
+        let window = Window::new(WindowType::Toplevel);
         let vbox = gtk::Box::new(Vertical, 2);
 
         // Conversation History
@@ -182,13 +180,24 @@ impl Widget for Win {
         messages.add(&label);
         vbox.pack_start(&messages, true, true, 0);
 
-        // Change username input
+        // Change username button
         let username_box = gtk::Box::new(Horizontal, 1);
         // let user_input = Entry::new();
         // username_box.add(&user_input);
         let username_button = Button::new_with_label("Change username");
         username_box.add(&username_button);
         vbox.pack_end(&username_box, false, false, 0);
+
+        // Change username dialog
+        let username_dialog = Dialog::new_with_buttons(
+                        Some("Change Username"),
+                        Some(&window),
+                        DialogFlags::MODAL | DialogFlags::DESTROY_WITH_PARENT,
+                        &[("Change", ResponseType::Apply.into()), 
+                          ("Cancel", ResponseType::Cancel.into())]
+                    );
+        let username_input = Entry::new();
+        username_dialog.get_content_area().add(&username_input);
 
         // Message Input
         let message_box = gtk::Box::new(Horizontal, 1);
@@ -199,18 +208,18 @@ impl Widget for Win {
         message_box.pack_end(&button, false, false, 0);
         vbox.pack_end(&message_box, false, false, 0);
 
-        let 
-
-        let window = Window::new(WindowType::Toplevel);
         // TODO: figure out how to add username to window title
         window.set_title("Chat");
         window.add(&vbox);
         window.show_all();
 
+        let change_response: i32 = ResponseType::Apply.into();
+
         connect!(relm, messages.get_vadjustment().unwrap(), connect_property_upper_notify(_), ScrollDown);
         connect!(relm, button, connect_clicked(_), SendMsg);
         connect!(relm, window, connect_delete_event(_, _), return (Some(Quit), Inhibit(false)));
         connect!(relm, username_button, connect_clicked(_), OpenUsernameDialog);
+        connect!(relm, username_dialog, connect_response(_, change_response), ChangeUsername);
 
         Win {
             model,
@@ -219,6 +228,8 @@ impl Widget for Win {
                 input,
                 label,
                 window,
+                username_input,
+                username_dialog,
             },
         }
     }
