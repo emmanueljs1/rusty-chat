@@ -41,8 +41,9 @@ pub enum Msg {
     SendMsg,
     Quit,
     Received(Option<String>),
-    OpenUsernameDialog,
+    // OpenUsernameDialog,
     ChangeUsername,
+    // CloseDialog
 }
 
 pub struct Win {
@@ -53,11 +54,11 @@ pub struct Win {
 #[derive(Clone)]
 pub struct Widgets {
     messages: ScrolledWindow,
-    input: Entry,
+    message_input: Entry,
     label: Label,
     window: Window,
     username_input: Entry,
-    username_dialog: Dialog,
+    // username_dialog: Dialog,
 }
 
 impl Update for Win {
@@ -123,12 +124,12 @@ impl Update for Win {
                 }
             }
             SendMsg => {
-                let string: String = self.widgets.input.get_text()
+                let string: String = self.widgets.message_input.get_text()
                                                .expect("get_text failed")
                                                .chars()
                                                .collect();
                 if !string.is_empty() {
-                    self.widgets.input.set_text("");
+                    self.widgets.message_input.set_text("");
                     let mut stream = self.model.stream_lock.write().expect("Could not lock");
                     /* TODO: instead send a command formatted string */
                     let _ = stream.write(&string.as_bytes());
@@ -138,9 +139,13 @@ impl Update for Win {
                 let scroll_pos = self.widgets.messages.get_vadjustment().unwrap();
                 scroll_pos.set_value(scroll_pos.get_upper());
             }
-            OpenUsernameDialog => {
-                self.widgets.username_dialog.show_all();
-            }
+            // OpenUsernameDialog => {
+            //     self.widgets.username_dialog.show_all();
+            // }
+            // CloseDialog => {
+            //     // self.widgets.username_dialog.destroy();
+            //     println!("Dialog closed");
+            // }
             ChangeUsername => {
                 let new_username: String = self.widgets.username_input.get_text()
                                                .expect("get_text failed")
@@ -148,6 +153,7 @@ impl Update for Win {
                                                .collect();
                 if !new_username.is_empty() {
                     self.widgets.username_input.set_text("");
+                    // TODO: send change username command to server
                     println!("{:?}", new_username);
                 }
             }
@@ -182,28 +188,28 @@ impl Widget for Win {
 
         // Change username button
         let username_box = gtk::Box::new(Horizontal, 1);
-        // let user_input = Entry::new();
-        // username_box.add(&user_input);
+        let username_input = Entry::new();
+        username_box.add(&username_input);
         let username_button = Button::new_with_label("Change username");
         username_box.add(&username_button);
         vbox.pack_end(&username_box, false, false, 0);
 
-        // Change username dialog
-        let username_dialog = Dialog::new_with_buttons(
-                        Some("Change Username"),
-                        Some(&window),
-                        DialogFlags::MODAL | DialogFlags::DESTROY_WITH_PARENT,
-                        &[("Change", ResponseType::Apply.into()), 
-                          ("Cancel", ResponseType::Cancel.into())]
-                    );
-        let username_input = Entry::new();
-        username_dialog.get_content_area().add(&username_input);
+        // // Change username dialog
+        // let username_dialog = Dialog::new_with_buttons(
+        //                 Some("Change Username"),
+        //                 Some(&window),
+        //                 DialogFlags::MODAL | DialogFlags::DESTROY_WITH_PARENT,
+        //                 &[("Change", ResponseType::Apply.into()), 
+        //                   ("Cancel", ResponseType::Cancel.into())]
+        //             );
+        // let username_input = Entry::new();
+        // username_dialog.get_content_area().add(&username_input);
 
         // Message Input
         let message_box = gtk::Box::new(Horizontal, 1);
-        let input = Entry::new();
-        input.set_width_chars(30);
-        message_box.pack_start(&input, true, true, 0);
+        let message_input = Entry::new();
+        message_input.set_width_chars(30);
+        message_box.pack_start(&message_input, true, true, 0);
         let button = Button::new_with_label("Send");
         message_box.pack_end(&button, false, false, 0);
         vbox.pack_end(&message_box, false, false, 0);
@@ -213,23 +219,26 @@ impl Widget for Win {
         window.add(&vbox);
         window.show_all();
 
-        let change_response: i32 = ResponseType::Apply.into();
+        // let change_response: i32 = ResponseType::Apply.into();
 
         connect!(relm, messages.get_vadjustment().unwrap(), connect_property_upper_notify(_), ScrollDown);
+        connect!(relm, message_input, connect_activate(_), SendMsg);
         connect!(relm, button, connect_clicked(_), SendMsg);
         connect!(relm, window, connect_delete_event(_, _), return (Some(Quit), Inhibit(false)));
-        connect!(relm, username_button, connect_clicked(_), OpenUsernameDialog);
-        connect!(relm, username_dialog, connect_response(_, change_response), ChangeUsername);
+        connect!(relm, username_button, connect_clicked(_), ChangeUsername);
+        // connect!(relm, username_button, connect_clicked(_), OpenUsernameDialog);
+        // connect!(relm, username_dialog, connect_response(_, change_response), ChangeUsername);
+        // connect!(relm, username_dialog, connect_close(_), CloseDialog);
 
         Win {
             model,
             widgets: Widgets {
                 messages,
-                input,
+                message_input,
                 label,
                 window,
                 username_input,
-                username_dialog,
+                // username_dialog,
             },
         }
     }
