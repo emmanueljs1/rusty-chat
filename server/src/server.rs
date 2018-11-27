@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-// implement Sync trait
 
 pub struct ServerModel {
   users: HashMap<i32, String>

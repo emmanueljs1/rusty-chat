@@ -21,7 +21,7 @@ impl FromStr for Command {
       return Err(());
     }
     
-    let temp: Vec<&str> = s.trim_start_matches('/').split(' ').collect();
+    let temp: Vec<&str> = s.trim_left_matches('/').split(' ').collect();
     let ctype = match temp[0] {
       "nickname" => CommandType::NICKNAME,
       "msg" => CommandType::MESSAGE,
