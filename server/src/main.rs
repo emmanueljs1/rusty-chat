@@ -53,7 +53,9 @@ fn main() -> std::io::Result<()> {
                                 Err(e) =>  {
                                     match e.kind() {
                                         std::io::ErrorKind::WouldBlock => (),
-                                        _ => stream_closed = true,
+                                        _ => {
+                                            stream_closed = true;
+                                        }
                                     }
                                     break;
                                 }
@@ -107,6 +109,7 @@ fn main() -> std::io::Result<()> {
 
                     let mut streams = thread_streams.write().expect("Could not lock");
                     streams.remove(&addr);
+                    println!("Client exited: {}", addr);
                  });
 
                 handles.push(handle);

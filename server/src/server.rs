@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-// implement Sync trait
 
 pub struct ServerModel {
   users: HashMap<i32, String>
@@ -13,6 +12,7 @@ impl ServerModel {
   }
 
   pub fn register_user(&mut self) -> i32 {
+    println!("register user called");
     let id = self.generate_unique_id();
     let mut nickname = "User".to_string();
     let id_string = id.to_string();

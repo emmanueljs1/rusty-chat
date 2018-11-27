@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> fca9c8604ae50850d7b52d512d193c194cfac45d
 Current Usage:
 
 - `cd server` and then `cargo run` to run server
