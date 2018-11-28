@@ -31,6 +31,7 @@ use futures::sync::mpsc::channel;
 use self::Msg::*;
 
 pub struct Model {
+    relm: Relm<Win>,
     content: String,
     stream_lock: Arc<RwLock<TcpStream>>,
 }
@@ -42,7 +43,7 @@ pub enum Msg {
     Quit,
     Received(Option<String>),
     OpenUsernameDialog,
-    ChangeUsername,
+    ChangeUsername(Option<String>, Dialog),
     CloseDialog
 }
 
@@ -57,8 +58,8 @@ pub struct Widgets {
     message_input: Entry,
     label: Label,
     window: Window,
-    username_input: Entry,
-    username_dialog: Dialog,
+    // username_input: Entry,
+    // username_dialog: Dialog,
 }
 
 impl Update for Win {
@@ -66,11 +67,12 @@ impl Update for Win {
     type ModelParam = SocketAddr;
     type Msg = Msg;
 
-    fn model(_: &Relm<Self>, addr: SocketAddr) -> Model {
+    fn model(relm: &Relm<Self>, addr: SocketAddr) -> Model {
         let stream = TcpStream::connect(addr).expect("Cound not connect to server");
         let arc = Arc::new(RwLock::new(stream));
 
         Model {
+            relm: relm.clone(),
             content: String::new(),
             stream_lock: arc,
         }
@@ -142,21 +144,44 @@ impl Update for Win {
                 scroll_pos.set_value(scroll_pos.get_upper());
             }
             OpenUsernameDialog => {
-                self.widgets.username_dialog.show_all();
+                // Change username dialog
+                let username_dialog = Dialog::new_with_buttons(
+                                Some("Change Username"),
+                                Some(&self.widgets.window),
+                                DialogFlags::MODAL | DialogFlags::DESTROY_WITH_PARENT,
+                                &[("Change", ResponseType::Apply.into()), 
+                                  ("Cancel", ResponseType::Cancel.into())]
+                            );
+                let username_input = Entry::new();
+                username_dialog.get_content_area().add(&username_input);
+                username_dialog.show_all();
+                connect!(self.model.relm, username_dialog, connect_response(_, change_response), 
+                    ChangeUsername(username_input.get_text()));
+                // connect!(self.model.relm, username_button, connect_clicked(_), ChangeUsername(username_input.get_text()));
+                // let result = username_dialog.run();
+                // if result == 
+
             }
             CloseDialog => {
                 // self.widgets.username_dialog.destroy();
                 println!("Dialog closed");
             }
-            ChangeUsername => {
-                let new_username: String = self.widgets.username_input.get_text()
-                                               .expect("get_text failed")
-                                               .chars()
-                                               .collect();
-                if !new_username.is_empty() {
-                    self.widgets.username_input.set_text("");
-                    // TODO: send change username command to server
-                    println!("{:?}", new_username);
+            ChangeUsername(new_username_opt, username_dialog) => {
+                // let new_username: String = self.widgets.username_input.get_text()
+                //                                .expect("get_text failed")
+                //                                .chars()
+                //                                .collect();
+
+                match new_username_opt {
+                    Some(new_username) => {
+                        if !new_username.is_empty() {
+                            // self.widgets.username_input.set_text("");
+                            // TODO: send change username command to server
+                            println!("{:?}", new_username);
+                            // TODO: figure out how to close dialog
+                        }
+                    },
+                    None => gtk::main_quit(), 
                 }
             }
             Quit => gtk::main_quit(),
@@ -196,17 +221,6 @@ impl Widget for Win {
         username_box.add(&username_button);
         vbox.pack_end(&username_box, false, false, 0);
 
-        // Change username dialog
-        let username_dialog = Dialog::new_with_buttons(
-                        Some("Change Username"),
-                        Some(&window),
-                        DialogFlags::MODAL | DialogFlags::DESTROY_WITH_PARENT,
-                        &[("Change", ResponseType::Apply.into()), 
-                          ("Cancel", ResponseType::Cancel.into())]
-                    );
-        let username_input = Entry::new();
-        username_dialog.get_content_area().add(&username_input);
-
         // Message Input
         let message_box = gtk::Box::new(Horizontal, 1);
         let message_input = Entry::new();
@@ -230,8 +244,8 @@ impl Widget for Win {
         connect!(relm, window, connect_delete_event(_, _), return (Some(Quit), Inhibit(false)));
         // connect!(relm, username_button, connect_clicked(_), ChangeUsername);
         connect!(relm, username_button, connect_clicked(_), OpenUsernameDialog);
-        connect!(relm, username_dialog, connect_response(_, change_response), ChangeUsername);
-        connect!(relm, username_dialog, connect_close(_), CloseDialog);
+        // connect!(relm, username_dialog, connect_response(_, change_response), ChangeUsername);
+        // connect!(relm, username_dialog, connect_close(_), CloseDialog);
 
         Win {
             model,
@@ -240,8 +254,8 @@ impl Widget for Win {
                 message_input,
                 label,
                 window,
-                username_input,
-                username_dialog,
+                // username_input,
+                //username_dialog,
             },
         }
     }
