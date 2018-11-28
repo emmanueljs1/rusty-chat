@@ -13,8 +13,8 @@ use command::*;
 fn main() -> std::io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:25565")?;
     let streams = Arc::new(RwLock::new(HashMap::<SocketAddr, TcpStream>::new()));
-    let mut handles = vec![];
     let model = Arc::new(RwLock::new(ServerModel::new()));
+    let mut handles = vec![];
 
     loop {
         match listener.accept() {
@@ -76,6 +76,10 @@ fn main() -> std::io::Result<()> {
                         }
 
                         if !buffer.is_empty() {
+                            let cmd: Command = buffer.parse::<Command>().unwrap();
+
+                            let nickname = locked_server.update_with_cmd(&cmd, user_id);
+                            let cmd_string = cmd.as_msg(nickname);
                         /* TODO (megan):
                             -- change buffer from /<cmd> <arguments> to a Command object by implementing
                             FromStr trait for Command
@@ -99,7 +103,7 @@ fn main() -> std::io::Result<()> {
 
                             for mut stream in streams.values() {
                                 // TODO: change &buffer to &cmd_string
-                            let _ = stream.write_all(&buffer.as_bytes());
+                            let _ = stream.write_all(&cmd_string.as_bytes());
                             let _ = stream.flush();
                             }
                         }

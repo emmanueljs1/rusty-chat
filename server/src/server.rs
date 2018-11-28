@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use command::*;
 
 pub struct ServerModel {
   users: HashMap<i32, String>
@@ -14,19 +15,32 @@ impl ServerModel {
   pub fn register_user(&mut self) -> i32 {
     println!("register user called");
     let id = self.generate_unique_id();
-    let mut nickname = "User".to_string();
-    let id_string = id.to_string();
-    nickname.push_str(&id_string);
+    let nickname = self.get_default_nickname(id);
     self.users.insert(id, nickname);
     id
   }
 
+  pub fn get_default_nickname(&self, id: i32) -> String {
+    let mut nickname = "User".to_string();
+    let id_string = id.to_string();
+    nickname.push_str(&id_string);
+    nickname
+  }
+
+  pub fn update_with_cmd(&mut self, c: &Command, user_id: i32) -> String {
+    if c.ctype == CommandType::NICKNAME {
+      return self.change_nickname(user_id, &c.args);
+    }
+    return self.get_nickname(user_id);
+  }
   pub fn get_nickname(&self, id: i32) -> String {
     self.users.get(&id).expect("ID not found").to_string()
   }
 
-  pub fn change_nickname(&mut self, id: i32, new_name: &str) {
+  pub fn change_nickname(&mut self, id: i32, new_name: &str) -> String {
+    let old = self.get_nickname(id);
     self.users.insert(id, new_name.to_string());
+    old
   }
 
   pub fn remove_user(&mut self, id: i32) {
