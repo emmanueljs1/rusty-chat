@@ -49,7 +49,7 @@ fn main() -> std::io::Result<()> {
                     
                     let mut locked_server = thread_model.write().expect("Failed to lock server");
                     let user_id = locked_server.register_user();
-                    drop(locked_server)
+                    drop(locked_server);
 
                     loop {
                         let streams = thread_streams.read().expect("Could not lock");
@@ -86,9 +86,9 @@ fn main() -> std::io::Result<()> {
 
                         if just_connected {
                             for mut stream in streams.values() {
-                                let rl_server = thread_model.read().expect("could not lock server");
+                                let rl_server = thread_model.read().expect("Could not lock server");
                                 let mut default_nickname = rl_server.get_nickname(user_id);
-                                default_nickname.push_str(&"connected".to_string());
+                                default_nickname.push_str(&" connected".to_string());
                                 let _ = stream.write(default_nickname.as_bytes());
                                 let _ = stream.flush();
                             }
@@ -97,7 +97,7 @@ fn main() -> std::io::Result<()> {
                         if !buffer.is_empty() {
                             let cmd: Command = buffer.parse::<Command>().unwrap();
 
-                            let mut wl_server = thread_model.write().exoect("Could not lock");
+                            let mut wl_server = thread_model.write().expect("Could not lock");
                             let nickname = wl_server.update_with_cmd(&cmd, user_id);
                             drop(wl_server);
                             let cmd_string = cmd.as_msg(nickname);
@@ -113,8 +113,10 @@ fn main() -> std::io::Result<()> {
 
                     let mut streams = thread_streams.write().expect("Could not lock");
                     streams.remove(&addr);
+                    let mut server_for_delete = thread_model.write().expect("Could not lock server for deletion");
+                    server_for_delete.remove_user(user_id);
                     println!("Client exited: {}", addr);
-                 });
+                });
 
                 handles.push(handle);
             }
