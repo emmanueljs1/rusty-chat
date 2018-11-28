@@ -13,7 +13,6 @@ impl ServerModel {
   }
 
   pub fn register_user(&mut self) -> i32 {
-    println!("register user called");
     let id = self.generate_unique_id();
     let nickname = self.get_default_nickname(id);
     self.users.insert(id, nickname);
