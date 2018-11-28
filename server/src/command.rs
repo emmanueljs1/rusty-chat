@@ -1,5 +1,5 @@
+use std::io::{Error, ErrorKind};
 use std::str::FromStr;
-// use server::*;
 
 #[derive(PartialEq)]
 pub enum CommandType {
@@ -14,18 +14,11 @@ pub struct Command {
 }
 
 impl Command {
-  // pub fn update_server_model(&self, server: ServerModel, user_id: i32) -> String {
-  //   if self.ctype == CommandType::NICKNAME {
-  //     return server.change_nickname(user_id, &self.args);
-  //   }
-  //   return server.get_nickname(user_id);
-  // }
-
   pub fn as_msg(&self, curr_user: String) -> String {
     match self.ctype {
       CommandType::NICKNAME => {
         let mut temp = curr_user;
-        temp.push_str(&"has changed nickname to ".to_string());
+        temp.push_str(&" has changed nickname to ".to_string());
         temp.push_str(&self.args);
         return temp;
       },
@@ -40,11 +33,11 @@ impl Command {
   }
 }
 impl FromStr for Command {
-  type Err = ();
+  type Err = Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
     if !s.starts_with("/") {
-      return Err(());
+      return Err(Error::new(ErrorKind::Other, "Command should start with /"));
     }
     
 
@@ -56,7 +49,7 @@ impl FromStr for Command {
     };
 
     if ctype == CommandType::INVALID {
-      return Err(());
+      return Err(Error::new(ErrorKind::Other, "Invalid command type"));
     }
 
     let args = temp[1..].join(" ");
