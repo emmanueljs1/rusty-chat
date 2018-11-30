@@ -1,3 +1,5 @@
+extern crate local_ip;
+
 use std::io::prelude::*;
 use std::thread;
 use std::net::{TcpListener, TcpStream, SocketAddr};
@@ -6,7 +8,10 @@ use std::sync::{Arc, RwLock};
 use std::clone::Clone;
 
 fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("127.0.0.1:25565")?;
+    let mut ip = local_ip::get().unwrap().to_string();
+    ip.push_str(":8000");
+
+    let listener = TcpListener::bind(ip)?;
     let streams = Arc::new(RwLock::new(HashMap::<SocketAddr, TcpStream>::new()));
     let mut handles = vec![];
 

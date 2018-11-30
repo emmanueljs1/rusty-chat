@@ -1,5 +1,6 @@
 extern crate gtk;
 extern crate futures;
+extern crate local_ip;
 #[macro_use] extern crate relm;
 #[macro_use] extern crate relm_derive;
 
@@ -15,14 +16,17 @@ fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
 
     if args.len() <= 2 {
-        let addr_str = {
-            if args.len() == 2 {
-                args[1].clone()
-            }
-            else {
-                "127.0.0.1:25565".to_string()
-            }
-        };
+        let mut addr_str = local_ip::get().unwrap().to_string();
+        addr_str.push_str(":8000");
+
+        // let addr_str = {
+        //     if args.len() == 2 {
+        //         args[1].clone()
+        //     }
+        //     else {
+        //         "127.0.0.1:25565".to_string()
+        //     }
+        // };
 
         match addr_str.to_socket_addrs() {
             Ok(mut socket_addrs) => {
