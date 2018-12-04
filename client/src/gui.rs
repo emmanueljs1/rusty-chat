@@ -43,8 +43,8 @@ pub enum Msg {
     Quit,
     Received(Option<String>),
     OpenUsernameDialog,
-    ChangeUsername(Option<String>, Dialog),
-    CloseDialog
+    // CloseDialog,
+    ChangeUsername(Option<String>),
 }
 
 pub struct Win {
@@ -59,7 +59,7 @@ pub struct Widgets {
     label: Label,
     window: Window,
     // username_input: Entry,
-    // username_dialog: Dialog,
+    // username_dialog: Option<Dialog>,
 }
 
 impl Update for Win {
@@ -149,24 +149,42 @@ impl Update for Win {
                                 Some("Change Username"),
                                 Some(&self.widgets.window),
                                 DialogFlags::MODAL | DialogFlags::DESTROY_WITH_PARENT,
-                                &[("Change", ResponseType::Apply.into()), 
-                                  ("Cancel", ResponseType::Cancel.into())]
+                                &[("Change", ResponseType::Apply.into())]
                             );
                 let username_input = Entry::new();
                 username_dialog.get_content_area().add(&username_input);
                 username_dialog.show_all();
-                connect!(self.model.relm, username_dialog, connect_response(_, change_response), 
-                    ChangeUsername(username_input.get_text()));
+                loop {
+                    let response = username_dialog.run();
+                    println!("{:?}", response);
+                    if response == ResponseType::Apply.into() {
+                        match username_input.get_text() {
+                           Some(new_username) => {
+                               if !new_username.is_empty() {
+                                   println!("{:?}", new_username);
+                                   username_dialog.destroy();
+                                   break;
+                               }
+                           },
+                           None => gtk::main_quit(), 
+                        }
+                    } else {
+                        username_dialog.destroy();
+                        break;
+                    }
+                }
+
+                // connect!(self.model.relm, username_dialog, connect_response(_,_), ChangeUsername(username_input.get_text()));
                 // connect!(self.model.relm, username_button, connect_clicked(_), ChangeUsername(username_input.get_text()));
                 // let result = username_dialog.run();
                 // if result == 
 
             }
-            CloseDialog => {
-                // self.widgets.username_dialog.destroy();
-                println!("Dialog closed");
-            }
-            ChangeUsername(new_username_opt, username_dialog) => {
+            // CloseDialog => {
+            //     // self.widgets.username_dialog.destroy();
+            //     println!("Dialog closed");
+            // }
+            ChangeUsername(new_username_opt) => {
                 // let new_username: String = self.widgets.username_input.get_text()
                 //                                .expect("get_text failed")
                 //                                .chars()
@@ -236,6 +254,8 @@ impl Widget for Win {
         window.add(&vbox);
         window.show_all();
 
+        // let username_dialog = None;
+
         // let change_response: i32 = ResponseType::Apply.into();
 
         connect!(relm, messages.get_vadjustment().unwrap(), connect_property_upper_notify(_), ScrollDown);
@@ -254,6 +274,7 @@ impl Widget for Win {
                 message_input,
                 label,
                 window,
+                // username_dialog,
                 // username_input,
                 //username_dialog,
             },
