@@ -124,7 +124,7 @@ impl Update for Win {
                 }
             }
             SendMsg => {
-                let string: String = self.widgets.message_input.get_text()
+                let mut string: String = self.widgets.message_input.get_text()
                                                .expect("get_text failed")
                                                .chars()
                                                .collect();
@@ -132,6 +132,7 @@ impl Update for Win {
                     self.widgets.message_input.set_text("");
                     let mut stream = self.model.stream_lock.write().expect("Could not lock");
                     /* TODO: instead send a command formatted string */
+                    string = "/msg ".to_string() + &string;
                     let _ = stream.write(&string.as_bytes());
                 }
             }
