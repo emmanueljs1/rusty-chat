@@ -68,6 +68,7 @@ version = "0.1.0"
 dependencies = [
  "futures 0.1.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "gtk 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pango 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "relm 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "relm-derive 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

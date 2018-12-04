@@ -1,3 +1,4 @@
+
 use gtk::{
     AdjustmentExt,
     Align,
@@ -12,6 +13,7 @@ use gtk::{
     Inhibit,
     Label,
     LabelExt,
+    PolicyType,
     WidgetExt,
     ResponseType,
     ScrolledWindow,
@@ -21,6 +23,7 @@ use gtk::{
     Button,
     ButtonExt
 };
+use pango::WrapMode;
 use gtk::Orientation::{Horizontal, Vertical};
 use relm::{Relm, Update, Widget};
 use std::io::{Read, Write};
@@ -43,8 +46,6 @@ pub enum Msg {
     Quit,
     Received(Option<String>),
     OpenUsernameDialog,
-    // CloseDialog,
-    ChangeUsername(Option<String>),
 }
 
 pub struct Win {
@@ -58,8 +59,6 @@ pub struct Widgets {
     message_input: Entry,
     label: Label,
     window: Window,
-    // username_input: Entry,
-    // username_dialog: Option<Dialog>,
 }
 
 impl Update for Win {
@@ -144,7 +143,6 @@ impl Update for Win {
                 scroll_pos.set_value(scroll_pos.get_upper());
             }
             OpenUsernameDialog => {
-                // Change username dialog
                 let username_dialog = Dialog::new_with_buttons(
                                 Some("Change Username"),
                                 Some(&self.widgets.window),
@@ -156,12 +154,13 @@ impl Update for Win {
                 username_dialog.show_all();
                 loop {
                     let response = username_dialog.run();
-                    println!("{:?}", response);
                     if response == ResponseType::Apply.into() {
                         match username_input.get_text() {
                            Some(new_username) => {
                                if !new_username.is_empty() {
-                                   println!("{:?}", new_username);
+                                   let string = "/nickname ".to_string() + &new_username;
+                                   let mut stream = self.model.stream_lock.write().expect("Could not lock");
+                                   let _ = stream.write(&string.as_bytes());
                                    username_dialog.destroy();
                                    break;
                                }
@@ -172,34 +171,6 @@ impl Update for Win {
                         username_dialog.destroy();
                         break;
                     }
-                }
-
-                // connect!(self.model.relm, username_dialog, connect_response(_,_), ChangeUsername(username_input.get_text()));
-                // connect!(self.model.relm, username_button, connect_clicked(_), ChangeUsername(username_input.get_text()));
-                // let result = username_dialog.run();
-                // if result == 
-
-            }
-            // CloseDialog => {
-            //     // self.widgets.username_dialog.destroy();
-            //     println!("Dialog closed");
-            // }
-            ChangeUsername(new_username_opt) => {
-                // let new_username: String = self.widgets.username_input.get_text()
-                //                                .expect("get_text failed")
-                //                                .chars()
-                //                                .collect();
-
-                match new_username_opt {
-                    Some(new_username) => {
-                        if !new_username.is_empty() {
-                            // self.widgets.username_input.set_text("");
-                            // TODO: send change username command to server
-                            println!("{:?}", new_username);
-                            // TODO: figure out how to close dialog
-                        }
-                    },
-                    None => gtk::main_quit(), 
                 }
             }
             Quit => gtk::main_quit(),
@@ -225,9 +196,14 @@ impl Widget for Win {
         // Conversation History
         let messages = ScrolledWindow::new(None, None);
         messages.set_min_content_height(400);
+        messages.set_margin_left(10);
+        messages.set_margin_right(10);
+        messages.set_property_hscrollbar_policy(PolicyType::Never);
         let label = Label::new(None);
         label.set_valign(Align::Start);
         label.set_halign(Align::Start);
+        label.set_line_wrap(true);
+        label.set_line_wrap_mode(WrapMode::WordChar);
         messages.add(&label);
         vbox.pack_start(&messages, true, true, 0);
 
@@ -238,6 +214,8 @@ impl Widget for Win {
         let username_button = Button::new_with_label("Change username");
         username_box.add(&username_button);
         vbox.pack_end(&username_box, false, false, 0);
+
+        // let username_dialog = None;
 
         // Message Input
         let message_box = gtk::Box::new(Horizontal, 1);
