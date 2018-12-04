@@ -91,6 +91,13 @@ fn main() -> std::io::Result<()> {
                                 default_nickname.push_str(&" connected".to_string());
                                 let _ = stream.write(default_nickname.as_bytes());
                                 let _ = stream.flush();
+                                
+                                if stream.peer_addr().unwrap() == addr {
+                                    let mut welcome_str = "\nWelcome to the chat server, you are ".to_string(); 
+                                    welcome_str.push_str(&rl_server.get_nickname(user_id));
+                                    let _ = stream.write(welcome_str.as_bytes());
+                                    let _ = stream.flush();
+                                }
                             }
                         }
 
