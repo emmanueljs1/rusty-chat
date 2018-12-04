@@ -1,12 +1,30 @@
+extern crate local_ip;
+
 use std::io::prelude::*;
 use std::thread;
 use std::net::{TcpListener, TcpStream, SocketAddr};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::clone::Clone;
+use std::env;
 
 fn main() -> std::io::Result<()> {
-    let listener = TcpListener::bind("127.0.0.1:25565")?;
+    let mut ip = String::new();
+
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() > 1 && args[1] == "remote" {
+        ip = local_ip::get().unwrap().to_string();
+        ip.push_str(":65535");
+    }
+    else {
+        ip = "127.0.0.1:65535".to_string()
+    }
+
+    println!("Clients should use IP address: {}", ip);
+
+
+    let listener = TcpListener::bind(ip)?;
     let streams = Arc::new(RwLock::new(HashMap::<SocketAddr, TcpStream>::new()));
     let mut handles = vec![];
 
@@ -56,7 +74,9 @@ fn main() -> std::io::Result<()> {
                                 Err(e) =>  {
                                     match e.kind() {
                                         std::io::ErrorKind::WouldBlock => (),
-                                        _ => stream_closed = true,
+                                        _ => {
+                                            stream_closed = true;
+                                        }
                                     }
                                     break;
                                 }
@@ -109,6 +129,7 @@ fn main() -> std::io::Result<()> {
 
                     let mut streams = thread_streams.write().expect("Could not lock");
                     streams.remove(&addr);
+                    println!("Client exited: {}", addr);
                  });
 
                 handles.push(handle);

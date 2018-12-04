@@ -20,7 +20,7 @@ fn main() -> std::io::Result<()> {
                 args[1].clone()
             }
             else {
-                "127.0.0.1:25565".to_string()
+                "127.0.0.1:65535".to_string()
             }
         };
 
