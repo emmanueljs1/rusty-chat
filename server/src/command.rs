@@ -2,30 +2,30 @@ use std::io::{Error, ErrorKind};
 use std::str::FromStr;
 
 #[derive(PartialEq)]
-pub enum CommandType {
-  MESSAGE,
-  NICKNAME,
+pub enum Command {
+  MESSAGE(String),
+  NICKNAME(String),
   INVALID
 }
 
-pub struct Command {
-  pub ctype: CommandType,
-  pub args: String
-}
+// pub struct Command {
+//   pub ctype: CommandType,
+//   pub args: String
+// }
 
 impl Command {
   pub fn as_msg(&self, curr_user: String) -> String {
-    match self.ctype {
-      CommandType::NICKNAME => {
+    match self {
+      Command::NICKNAME(args) => {
         let mut temp = curr_user;
         temp.push_str(&" has changed nickname to ".to_string());
-        temp.push_str(&self.args);
+        temp.push_str(&args);
         return temp;
       },
-      CommandType::MESSAGE => {
+      Command::MESSAGE(msg) => {
         let mut temp = curr_user;
         temp.push_str(&": ".to_string());
-        temp.push_str(&self.args);
+        temp.push_str(&msg);
         return temp;
       },
       _ => return "Invalid command".to_string()
@@ -41,17 +41,18 @@ impl FromStr for Command {
     }
     
     let temp: Vec<&str> = s.trim_left_matches('/').split(' ').collect();
-    let ctype = match temp[0] {
-      "nickname" => CommandType::NICKNAME,
-      "msg" => CommandType::MESSAGE,
-      _ => CommandType::INVALID
+    let args = temp[1..].join(" ");
+    let command = match temp[0] {
+      "nickname" => Command::NICKNAME(args),
+      "msg" => Command::MESSAGE(args),
+      _ => Command::INVALID
     };
 
-    if ctype == CommandType::INVALID {
+    if command == Command::INVALID {
       return Err(Error::new(ErrorKind::Other, "Invalid command type"));
     }
 
-    let args = temp[1..].join(" ");
-    Ok(Command { ctype: ctype, args: args })
+    
+    Ok(command)
   }
 }

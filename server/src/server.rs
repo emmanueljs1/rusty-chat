@@ -27,11 +27,12 @@ impl ServerModel {
   }
 
   pub fn update_with_cmd(&mut self, c: &Command, user_id: i32) -> String {
-    if c.ctype == CommandType::NICKNAME {
-      return self.change_nickname(user_id, &c.args);
-    }
-    return self.get_nickname(user_id);
+    match c  {
+      Command::NICKNAME(args) => return self.change_nickname(user_id, &args),
+      _ => return self.get_nickname(user_id)
+    };
   }
+
   pub fn get_nickname(&self, id: i32) -> String {
     self.users.get(&id).expect("ID not found").to_string()
   }
