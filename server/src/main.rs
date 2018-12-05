@@ -123,7 +123,16 @@ fn main() -> std::io::Result<()> {
 
                     let mut streams = thread_streams.write().expect("Could not lock");
                     streams.remove(&addr);
+
                     let mut server_for_delete = thread_model.write().expect("Could not lock server for deletion");
+
+                    for mut stream in streams.values() {
+                        let mut disconnect_msg = server_for_delete.get_nickname(user_id);
+                        disconnect_msg.push_str(&" disconnected".to_string());
+                        let _ = stream.write(disconnect_msg.as_bytes());
+                        let _ = stream.flush();
+                    }
+
                     server_for_delete.remove_user(user_id);
                     println!("Client exited: {}", addr);
                 });
