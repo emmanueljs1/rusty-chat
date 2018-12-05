@@ -28,9 +28,9 @@ impl ServerModel {
 
   pub fn update_with_cmd(&mut self, c: &Command, user_id: i32) -> String {
     match c  {
-      Command::NICKNAME(args) => return self.change_nickname(user_id, &args),
-      _ => return self.get_nickname(user_id)
-    };
+      Command::NICKNAME(args) => self.change_nickname(user_id, &args),
+      _ => self.get_nickname(user_id)
+    }
   }
 
   pub fn get_nickname(&self, id: i32) -> String {

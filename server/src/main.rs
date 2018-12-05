@@ -13,9 +13,9 @@ use server::*;
 use command::*;
 
 fn main() -> std::io::Result<()> {
-    let mut ip = String::new();
-
     let args: Vec<String> = env::args().collect();
+
+    let mut ip;
 
     if args.len() > 1 && args[1] == "remote" {
         ip = local_ip::get().unwrap().to_string();
