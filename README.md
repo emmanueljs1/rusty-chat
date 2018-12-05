@@ -3,12 +3,23 @@
 ### Emma "Crusty" Suarez, Megan Paik, Yash Palkhiwala aka the "jaded rustaceans"
 
 ## Description
-Rusty Chat is  a chat server that allows various users to communicate via a chat server. 
+Rusty Chat is  a chat server that allows various users to communicate via a chat server.
 
 ## Instructions
-- `cd server` and then `./target/debug/chat-server` to run server (with `--help` to see options)
-- (on separate terminal windows):
-  - `cd client` and then `./target/debug/chat-client` to run client (with `--help` to see options)
+- To see the options for the server, do:
+  ```
+  cd server
+  cargo build
+  ./target/debug/chat-server --help
+  ```
+  Mainly, running the executable with `-r` runs the server through the host IP, so that different machines can connect to   it. The default ip is `localhost`
+- To see the options for the client, do:
+  ```
+  cd client
+  cargo build
+  ./target/debug/chat-client --help
+  ```
+  Running the executable alone connects to the client to `localhost`, otherwise an IP address can be specified as an argument
 
 ## Code Architecture
 * Server
