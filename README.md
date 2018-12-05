@@ -1,5 +1,5 @@
 # Rusty Chat
-Rusty Chat is a chat server written entirely in Rust that allows various users to communicate via a chat server.
+Rusty Chat is a chat server written entirely in Rust that allows various users to communicate via a remote connection.
 
 <img src="assets/user0.png" width="400" /> <img src="assets/user1.png" width="400" />
 <p align="center"><img src="assets/user3.png" width="300" /></p>
