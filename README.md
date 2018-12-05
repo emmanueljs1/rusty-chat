@@ -1,11 +1,15 @@
 # Rusty Chat
+Rusty Chat is a chat server written entirely in Rust that allows various users to communicate via a chat server.
 
-### Emma "Crusty" Suarez, Megan Paik, Yash Palkhiwala aka the "jaded rustaceans"
+<img src="assets/user0.png" width="400" /> <img src="assets/user1.png" width="400" />
 
-## Description
-Rusty Chat is  a chat server that allows various users to communicate via a chat server.
+## Overview
 
-## Instructions
+### Dependencies
+- [GTK+](https://gtk-rs.org/docs-src/requirements)
+- [Rust](https://www.rust-lang.org/en-US/install.html)
+
+### Instructions
 - To see the options for the server, do:
   ```
   cd server
@@ -21,7 +25,7 @@ Rusty Chat is  a chat server that allows various users to communicate via a chat
   ```
   Running the executable alone connects to the client to `localhost`, otherwise an IP address can be specified as an argument
 
-## Code Architecture
+### Code Architecture
 * Server
    * Take advantage of Rust’s concurrency
    * Receive/relay messages to the channel
@@ -29,6 +33,8 @@ Rusty Chat is  a chat server that allows various users to communicate via a chat
 * Client
    * Terminal chat window (GUI)
    * Let user send messages and change nickname
-
-## Example
-<img src="assets/user0.png" width="400" /> <img src="assets/user1.png" width="400" />
+   
+### Contributors (aka the jaded rustaceans)
+- Emma "Crusty" Suarez 
+- Megan Paik
+- Yash Palkhiwala
