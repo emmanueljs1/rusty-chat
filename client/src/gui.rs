@@ -34,7 +34,6 @@ use futures::sync::mpsc::channel;
 use self::Msg::*;
 
 pub struct Model {
-    relm: Relm<Win>,
     content: String,
     stream_lock: Arc<RwLock<TcpStream>>,
 }
@@ -66,12 +65,11 @@ impl Update for Win {
     type ModelParam = SocketAddr;
     type Msg = Msg;
 
-    fn model(relm: &Relm<Self>, addr: SocketAddr) -> Model {
+    fn model(_: &Relm<Self>, addr: SocketAddr) -> Model {
         let stream = TcpStream::connect(addr).expect("Cound not connect to server");
         let arc = Arc::new(RwLock::new(stream));
 
         Model {
-            relm: relm.clone(),
             content: String::new(),
             stream_lock: arc,
         }
@@ -129,11 +127,9 @@ impl Update for Win {
                                                .expect("get_text failed")
                                                .chars()
                                                .collect();
-                println!("{:?}", string.as_str());
                 if !string.is_empty() {
                     self.widgets.message_input.set_text("");
                     let mut stream = self.model.stream_lock.write().expect("Could not lock");
-                    /* TODO: instead send a command formatted string */
                     string = "/msg ".to_string() + &string;
                     let _ = stream.write(&string.as_bytes());
                 }
@@ -186,18 +182,15 @@ impl Widget for Win {
     }
 
     fn view(relm: &Relm<Self>, model: Self::Model) -> Self {
-        /* TODO (yash):
-            - change GUI to be a _real_ GUI
-            - add option to change nickname and (possibly?) to change text color */
-
+        
         let window = Window::new(WindowType::Toplevel);
         let vbox = gtk::Box::new(Vertical, 2);
 
         // Conversation History
         let messages = ScrolledWindow::new(None, None);
         messages.set_min_content_height(400);
-        messages.set_margin_left(10);
-        messages.set_margin_right(10);
+        messages.set_margin_start(10);
+        messages.set_margin_end(10);
         messages.set_property_hscrollbar_policy(PolicyType::Never);
         let label = Label::new(None);
         label.set_valign(Align::Start);
@@ -209,13 +202,10 @@ impl Widget for Win {
 
         // Change username button
         let username_box = gtk::Box::new(Horizontal, 1);
-        // let username_input = Entry::new();
-        // username_box.add(&username_input);
         let username_button = Button::new_with_label("Change username");
-        username_box.add(&username_button);
+        username_box.set_center_widget(&username_button);
         vbox.pack_end(&username_box, false, false, 0);
 
-        // let username_dialog = None;
 
         // Message Input
         let message_box = gtk::Box::new(Horizontal, 1);
@@ -227,23 +217,15 @@ impl Widget for Win {
         message_box.pack_end(&button, false, false, 0);
         vbox.pack_end(&message_box, false, false, 0);
 
-        // TODO: figure out how to add username to window title
         window.set_title("Chat");
         window.add(&vbox);
         window.show_all();
-
-        // let username_dialog = None;
-
-        // let change_response: i32 = ResponseType::Apply.into();
 
         connect!(relm, messages.get_vadjustment().unwrap(), connect_property_upper_notify(_), ScrollDown);
         connect!(relm, message_input, connect_activate(_), SendMsg);
         connect!(relm, button, connect_clicked(_), SendMsg);
         connect!(relm, window, connect_delete_event(_, _), return (Some(Quit), Inhibit(false)));
-        // connect!(relm, username_button, connect_clicked(_), ChangeUsername);
         connect!(relm, username_button, connect_clicked(_), OpenUsernameDialog);
-        // connect!(relm, username_dialog, connect_response(_, change_response), ChangeUsername);
-        // connect!(relm, username_dialog, connect_close(_), CloseDialog);
 
         Win {
             model,
@@ -252,9 +234,6 @@ impl Widget for Win {
                 message_input,
                 label,
                 window,
-                // username_dialog,
-                // username_input,
-                //username_dialog,
             },
         }
     }
