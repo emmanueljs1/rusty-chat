@@ -78,7 +78,7 @@ impl Update for Win {
     }
 
     fn subscriptions(&mut self, relm: &Relm<Self>) {
-        let (mut sender, receiver) = channel::<Option<String>>(1);
+        let (mut sender, receiver) = channel::<Option<String>>(100);
 
         let stream_lock = Arc::clone(&self.model.stream_lock);
         thread::spawn(move || {
