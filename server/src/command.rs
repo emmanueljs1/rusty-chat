@@ -8,11 +8,6 @@ pub enum Command {
   INVALID
 }
 
-// pub struct Command {
-//   pub ctype: CommandType,
-//   pub args: String
-// }
-
 impl Command {
   pub fn as_msg(&self, curr_user: String) -> String {
     match self {
