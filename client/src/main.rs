@@ -11,7 +11,6 @@ mod args;
 use gui::Win;
 use args::Opt;
 use relm::Widget;
-use std::env;
 use std::net::ToSocketAddrs;
 use std::io::{Error, ErrorKind};
 use structopt::StructOpt;
