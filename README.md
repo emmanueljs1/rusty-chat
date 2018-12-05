@@ -2,6 +2,7 @@
 Rusty Chat is a chat server written entirely in Rust that allows various users to communicate via a chat server.
 
 <img src="assets/user0.png" width="400" /> <img src="assets/user1.png" width="400" />
+<p align="center"><img src="assets/user3.png" width="300" /></p>
 
 ## Overview
 
@@ -33,8 +34,11 @@ Rusty Chat is a chat server written entirely in Rust that allows various users t
 * Client
    * Terminal chat window (GUI)
    * Let user send messages and change nickname
-   
+ 
 ### Contributors (aka the jaded rustaceans)
 - Emma "Crusty" Suarez 
 - Megan Paik
 - Yash Palkhiwala
+
+### Acknowledgements
+This project was developed as a final project for CIS 198 at the University of Pennsylvania in Fall 2018
