@@ -5,6 +5,6 @@ use structopt::StructOpt;
 #[structopt(name = "chat server client", about = "A client that connects to a chat server")]
 pub struct Opt {
     #[structopt(name = "ip_addr")]
-    /// run server remotely
+    /// IP address to connect to (defaults to localhost)
     pub ip_addr: Option<String>,
 }
