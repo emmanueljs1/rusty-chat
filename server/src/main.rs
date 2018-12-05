@@ -1,6 +1,8 @@
 extern crate local_ip;
+extern crate structopt;
 mod server;
 mod command;
+mod args;
 
 use std::io::prelude::*;
 use std::thread;
@@ -8,16 +10,17 @@ use std::net::{TcpListener, TcpStream, SocketAddr};
 use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 use std::clone::Clone;
-use std::env;
+use structopt::StructOpt;
 use server::*;
 use command::*;
+use args::Opt;
 
 fn main() -> std::io::Result<()> {
-    let args: Vec<String> = env::args().collect();
+    let opt: Opt = Opt::from_args();
 
     let mut ip;
 
-    if args.len() > 1 && args[1] == "remote" {
+    if opt.remote {
         ip = local_ip::get().unwrap().to_string();
         ip.push_str(":65535");
     }

@@ -5,3 +5,4 @@ authors = ["Emmanuel Suarez Acevedo <emmanueljs1@gmail.com>"]
 
 [dependencies]
 local-ip = "0.1"
+structopt = "0.2"
