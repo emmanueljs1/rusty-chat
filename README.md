@@ -20,10 +20,4 @@ Rusty Chat is  a chat server that allows various users to communicate via a chat
    * Let user send messages and change nickname
 
 ## Example
-User 0: 
-<br>
-<img src="assets/user0.png" />
-
-User 1:  
-<br>
-<img src="assets/user1.png" />
+<img src="assets/user0.png" width="400" /> <img src="assets/user1.png" width="400" />
