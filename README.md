@@ -6,51 +6,17 @@
 Rusty Chat is  a chat server that allows various users to communicate via a chat server. 
 
 ## Instructions
-- `cd server` and then `cargo run` to run server
+- `cd server` and then `./target/debug/chat-server` to run server (with `--help` to see options)
 - (on separate terminal windows):
-  - `cd client` and then `cargo run` to run client
-  - send messages to stdin and see them sent to all clients
+  - `cd client` and then `./target/debug/chat-client` to run client (with `--help` to see options)
 
 ## Code Architecture
 * Server
-   * take advantage of Rust’s concurrency
+   * Take advantage of Rust’s concurrency
    * Receive/relay messages to the channel
-   * Support various channels (stretch goal)
+   * Keep track of connected users
 * Client
-   * Terminal chat window (termion)
-      * use commands to interact with server, for example:
-         * /msg <msg>
-         * /nickname <nickname>
+   * Terminal chat window (GUI)
+   * Let user send messages and change nickname
 
 ## Example
-
-Yash's Window:
-```
-User0 joined.
-User1 joined.
-User0 changed their name to Yash.
-User1 changed their name to Megan.
-Yash: Hello
-Megan: Hi
-
-
-> /nickname Yash
-> /msg Hello
->
-```
---------------------------------------------------------------------------------------------------------------
-Megan's Window:
-```
-User0 joined.
-User1 joined.
-User0 changed their name to Yash.
-User1 changed their name to Megan.
-Yash: Hello
-Megan: Hi
-
-
-
-> /nickname Megan
-> /msg Hi
->
-```
