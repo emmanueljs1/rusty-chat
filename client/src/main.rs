@@ -17,8 +17,6 @@ use std::io::{Error, ErrorKind};
 use structopt::StructOpt;
 
 fn main() -> std::io::Result<()> {
-    let args: Vec<String> = env::args().collect();
-
     let opt: Opt = Opt::from_args();
 
     let addr_str = {
