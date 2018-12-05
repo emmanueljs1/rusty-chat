@@ -217,7 +217,7 @@ impl Widget for Win {
         message_box.pack_end(&button, false, false, 0);
         vbox.pack_end(&message_box, false, false, 0);
 
-        window.set_title("Chat");
+        window.set_title("Rusty Chat");
         window.add(&vbox);
         window.show_all();
 
