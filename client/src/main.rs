@@ -1,46 +1,45 @@
 extern crate gtk;
 extern crate futures;
 extern crate pango;
+extern crate structopt;
 #[macro_use] extern crate relm;
 #[macro_use] extern crate relm_derive;
 
 mod gui;
+mod args;
 
 use gui::Win;
+use args::Opt;
 use relm::Widget;
 use std::env;
 use std::net::ToSocketAddrs;
 use std::io::{Error, ErrorKind};
+use structopt::StructOpt;
 
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() <= 2 {
-        let addr_str = {
-            if args.len() == 2 {
-                args[1].clone()
-            }
-            else {
-                "127.0.0.1:65535".to_string()
-            }
-        };
+    let opt: Opt = Opt::from_args();
 
-        match addr_str.to_socket_addrs() {
-            Ok(mut socket_addrs) => {
-                match socket_addrs.next() {
-                    Some(socket_addr) => {
-                        match Win::run(socket_addr) {
-                            Ok(()) => Ok(()),
-                            Err(()) => Err(Error::new(ErrorKind::Other, "Could not run GUI")),
-                        }
-                    }
-                    None => Err(Error::new(ErrorKind::InvalidInput, "Invalid address")),
-                }
-            }
-            Err(e) => Err(Error::new(ErrorKind::Other, e)),
+    let addr_str = {
+        match opt.ip_addr {
+            None => "127.0.0.1:65535".to_string(),
+            Some(str) => str,
         }
-    }
-    else {
-        Err(Error::new(ErrorKind::InvalidInput, "Too many or too few arguments"))
+    };
+
+    match addr_str.to_socket_addrs() {
+        Ok(mut socket_addrs) => {
+            match socket_addrs.next() {
+                Some(socket_addr) => {
+                    match Win::run(socket_addr) {
+                        Ok(()) => Ok(()),
+                        Err(()) => Err(Error::new(ErrorKind::Other, "Could not run GUI")),
+                    }
+                }
+                None => Err(Error::new(ErrorKind::InvalidInput, "Invalid address")),
+            }
+        }
+        Err(e) => Err(Error::new(ErrorKind::Other, e)),
     }
 }
