@@ -15,15 +15,15 @@ impl Command {
         let mut temp = curr_user;
         temp.push_str(&" has changed nickname to ".to_string());
         temp.push_str(&args);
-        return temp;
+        temp
       },
       Command::MESSAGE(msg) => {
         let mut temp = curr_user;
         temp.push_str(&": ".to_string());
         temp.push_str(&msg);
-        return temp;
+        temp
       },
-      _ => return "Invalid command".to_string()
+      _ => "Invalid command".to_string()
     }
   }
 }
@@ -31,7 +31,7 @@ impl FromStr for Command {
   type Err = Error;
 
   fn from_str(s: &str) -> Result<Self, Self::Err> {
-    if !s.starts_with("/") {
+    if !s.starts_with('/') {
       return Err(Error::new(ErrorKind::Other, "Command should start with /"));
     }
     
