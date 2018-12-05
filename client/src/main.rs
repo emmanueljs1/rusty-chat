@@ -1,5 +1,6 @@
 extern crate gtk;
 extern crate futures;
+extern crate pango;
 #[macro_use] extern crate relm;
 #[macro_use] extern crate relm_derive;
 
