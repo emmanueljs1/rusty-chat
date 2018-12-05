@@ -1,30 +1,28 @@
-Current Usage:
+# Rusty Chat
 
+### Emma "Crusty" Suarez, Megan Paik, Yash Palkhiwala aka the "jaded rustaceans"
+
+## Description
+Rusty Chat is  a chat server that allows various users to communicate via a chat server. 
+
+## Instructions
 - `cd server` and then `cargo run` to run server
 - (on separate terminal windows):
   - `cd client` and then `cargo run` to run client
   - send messages to stdin and see them sent to all clients
 
-Chat Server Project
-
-Overview:
-We will build a chat server that will allow various users to communicate in chat rooms. We plan to use the terminal to allow users to chat, and our stretch goal will be to implement in a GUI.
-
-Components:
-* Backend
+## Code Architecture
+* Server
    * take advantage of Rust’s concurrency
    * Receive/relay messages to the channel
    * Support various channels (stretch goal)
-* Frontend
+* Client
    * Terminal chat window (termion)
       * use commands to interact with server, for example:
          * /msg <msg>
          * /nickname <nickname>
-         * /color <color>
-         * /leave
-         * /join <channel> (strech goal)
 
-Example:
+## Example
 
 Yash's Window:
 ```
@@ -37,7 +35,6 @@ Megan: Hi
 
 
 > /nickname Yash
-> /color red
 > /msg Hello
 >
 ```
@@ -57,5 +54,3 @@ Megan: Hi
 > /msg Hi
 >
 ```
-   * Potentially a GUI (stretch goal)
-      * Use relm (https://github.com/antoyo/relm) or conrod (https://github.com/PistonDevelopers/conrod)
